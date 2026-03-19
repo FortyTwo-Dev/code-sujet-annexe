@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurant Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --card: #ffffff;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --dark: #0f172a;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.20);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.25), transparent 35%),
+        radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 30%),
+        linear-gradient(160deg, #020617 0%, #0f172a 45%, #111827 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 28px;
+      padding: 28px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 28px;
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.18);
+      color: #c7d2fe;
+      font-size: 0.95rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.1rem;
+      color: #f8fafc;
+      letter-spacing: 0.02em;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .stat-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.06));
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: 22px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 1.15rem;
+      color: #fff;
+    }
+
+    .products-list,
+    .orders-list,
+    .stats-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .product-card,
+    .order-card,
+    .mini-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .product-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .product-title {
+      margin: 0 0 6px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .product-description {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .price {
+      display: inline-block;
+      font-weight: 700;
+      color: #c7d2fe;
+      background: rgba(99, 102, 241, 0.18);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+
+    .qty-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 96px;
+    }
+
+    .qty-box label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: right;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(15, 23, 42, 0.65);
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input[type="text"]::placeholder {
+      color: #94a3b8;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(99, 102, 241, 0.8);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .cart-box {
+      margin: 18px 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      color: #e5e7eb;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      text-align: center;
+    }
+
+    .total-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 16px;
+      background: linear-gradient(90deg, rgba(99,102,241,0.2), rgba(16,185,129,0.18));
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .order-title {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .order-meta {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .status.pending { background: rgba(245, 158, 11, 0.18); color: #fcd34d; }
+    .status.preparing { background: rgba(99, 102, 241, 0.18); color: #c7d2fe; }
+    .status.ready { background: rgba(16, 185, 129, 0.18); color: #86efac; }
+    .status.delivered { background: rgba(34, 197, 94, 0.18); color: #bbf7d0; }
+    .status.cancelled { background: rgba(239, 68, 68, 0.18); color: #fecaca; }
+
+    .items-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #e2e8f0;
+    }
+
+    .items-list li + li {
+      margin-top: 6px;
+    }
+
+    .sub-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .mini-card h3 {
+      margin: 0 0 12px;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .mini-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #e5e7eb;
+      background: rgba(255,255,255,0.04);
+      padding: 12px 14px;
+      border-radius: 14px;
+    }
+
+    .mini-list span:last-child {
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    .loader {
+      color: var(--muted);
+      text-align: center;
+      padding: 20px;
+    }
+
+    @media (max-width: 980px) {
+      .layout,
+      .sub-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        width: min(100% - 20px, 1200px);
+        padding-top: 20px;
+      }
+
+      .hero,
+      .panel,
+      .stat-card {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .product-card,
+      .order-top {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div>
+        <h1>Restaurant Dashboard</h1>
+        <p>
+          Interface simple pour consulter les produits, créer des commandes,
+          suivre leur état et visualiser les statistiques du restaurant.
+        </p>
+      </div>
+      <div class="badge">PHP API + Go API + PostgreSQL</div>
+    </header>
+
+    <section class="section">
+      <h2 class="section-title">Vue d’ensemble</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Nombre de commandes</div>
+          <div class="stat-value" id="ordersCount">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Chiffre d’affaires</div>
+          <div class="stat-value" id="revenue">-- €</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Ticket moyen</div>
+          <div class="stat-value" id="averageBasket">-- €</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <h2>Produits disponibles</h2>
+        <div id="products" class="products-list">
+          <div class="loader">Chargement des produits...</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Nouvelle commande</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="customerName">Nom du client</label>
+          <input id="customerName" type="text" placeholder="Exemple : Alice Martin" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Panier</label>
+          <div id="cartItems" class="cart-box">
+            <div class="empty">Aucun article sélectionné.</div>
+          </div>
+        </div>
+
+        <div class="total-box">
+          <span>Total</span>
+          <span id="cartTotal">0.00 €</span>
+        </div>
+
+        <button class="btn btn-primary" id="createOrderBtn">Créer la commande</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sub-grid">
+        <div class="mini-card">
+          <h3>Top produits</h3>
+          <ul id="topProducts" class="mini-list">
+            <li><span>Chargement...</span><span>--</span></li>
+          </ul>
+        </div>
+
+        <div class="mini-card">
+          <h3>Répartition des statuts</h3>
+          <ul id="statusStats" class="mini-list">
+            <li><span>Chargement...</span><span>--</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Historique des commandes</h2>
+      <div id="orders" class="orders-list">
+        <div class="loader">Chargement des commandes...</div>
+      </div>
+    </section>
+
+    <p class="footer-note">Frontend statique en un seul fichier HTML pour un projet pédagogique Docker.</p>
+  </div>
+
+  <script>
+    const PHP_API = "http://localhost:8000";
+    const GO_API = "http://localhost:8080";
+
+    let products = [];
+    let orders = [];
+    let cart = {};
+
+    function formatPrice(value) {
+      return `${Number(value).toFixed(2)} €`;
+    }
+
+    function statusBadge(status) {
+      return `<span class="status ${status}">${status}</span>`;
+    }
+
+    async function fetchJSON(url, options = {}) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        let message = `HTTP ${response.status}`;
+        try {
+          const error = await response.json();
+          if (error.error) message = error.error;
+        } catch (_) {}
+        throw new Error(message);
+      }
+      return response.json();
+    }
+
+    function renderProducts() {
+      const container = document.getElementById("products");
+
+      if (!products.length) {
+        container.innerHTML = `<div class="empty">Aucun produit disponible.</div>`;
+        return;
+      }
+
+      container.innerHTML = products.map(product => `
+        <div class="product-card">
+          <div>
+            <h3 class="product-title">${product.name}</h3>
+            <p class="product-description">${product.description}</p>
+            <span class="price">${formatPrice(product.price)}</span>
+          </div>
+
+          <div class="qty-box">
+            <label for="qty-${product.id}">Quantité</label>
+            <input
+              id="qty-${product.id}"
+              type="number"
+              min="0"
+              value="${cart[product.id] || 0}"
+              onchange="updateQty(${product.id}, this.value)"
+            />
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function updateQty(productId, value) {
+      const qty = Math.max(0, Number(value) || 0);
+      cart[productId] = qty;
+      renderCart();
+    }
+
+    function getCartItems() {
+      return products
+        .filter(product => (cart[product.id] || 0) > 0)
+        .map(product => ({
+          product_id: product.id,
+          name: product.name,
+          quantity: cart[product.id],
+          price: Number(product.price),
+          total: Number(product.price) * cart[product.id]
+        }));
+    }
+
+    function renderCart() {
+      const container = document.getElementById("cartItems");
+      const totalEl = document.getElementById("cartTotal");
+      const items = getCartItems();
+
+      if (!items.length) {
+        container.innerHTML = `<div class="empty">Aucun article sélectionné.</div>`;
+        totalEl.textContent = formatPrice(0);
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="cart-item">
+          <span>${item.name} × ${item.quantity}</span>
+          <strong>${formatPrice(item.total)}</strong>
+        </div>
+      `).join("");
+
+      const total = items.reduce((sum, item) => sum + item.total, 0);
+      totalEl.textContent = formatPrice(total);
+    }
+
+    function renderOverview(data) {
+      document.getElementById("ordersCount").textContent = data.orders_count ?? 0;
+      document.getElementById("revenue").textContent = formatPrice(data.revenue ?? 0);
+      document.getElementById("averageBasket").textContent = formatPrice(data.average_basket ?? 0);
+    }
+
+    function renderTopProducts(data) {
+      const container = document.getElementById("topProducts");
+
+      if (!data.length) {
+        container.innerHTML = `<li><span>Aucune donnée</span><span>--</span></li>`;
+        return;
+      }
+
+      container.innerHTML = data.map(item => `
+        <li>
+          <span>${item.product_name}</span>
+          <span>${item.total_quantity} vendus</span>
+        </li>
+      `).join("");
+    }
+
+    function renderStatusStats(data) {
+      const container = document.getElementById("statusStats");
+
+      if (!data.length) {
+        container.innerHTML = `<li><span>Aucune donnée</span><span>--</span></li>`;
+        return;
+      }
+
+      container.innerHTML = data.map(item => `
+        <li>
+          <span>${item.status}</span>
+          <span>${item.count}</span>
+        </li>
+      `).join("");
+    }
+
+    function renderOrders() {
+      const container = document.getElementById("orders");
+
+      if (!orders.length) {
+        container.innerHTML = `<div class="empty">Aucune commande pour le moment.</div>`;
+        return;
+      }
+
+      container.innerHTML = orders.map(order => `
+        <div class="order-card">
+          <div class="order-top">
+            <div>
+              <h3 class="order-title">Commande #${order.id}</h3>
+              <div class="order-meta">
+                <span>Client : ${order.customer_name}</span>
+                <span>Total : ${formatPrice(order.total_amount)}</span>
+                <span>Créée le : ${new Date(order.created_at).toLocaleString("fr-FR")}</span>
+                <span>${statusBadge(order.status)}</span>
+              </div>
+            </div>
+
+            <div style="min-width: 180px;">
+              <select onchange="updateOrderStatus(${order.id}, this.value)">
+                <option value="pending" ${order.status === "pending" ? "selected" : ""}>pending</option>
+                <option value="preparing" ${order.status === "preparing" ? "selected" : ""}>preparing</option>
+                <option value="ready" ${order.status === "ready" ? "selected" : ""}>ready</option>
+                <option value="delivered" ${order.status === "delivered" ? "selected" : ""}>delivered</option>
+                <option value="cancelled" ${order.status === "cancelled" ? "selected" : ""}>cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <ul class="items-list">
+            ${(order.items || []).map(item => `
+              <li>${item.product_name} × ${item.quantity} — ${formatPrice(item.line_total)}</li>
+            `).join("")}
+          </ul>
+        </div>
+      `).join("");
+    }
+
+    async function loadProducts() {
+      products = await fetchJSON(`${PHP_API}/products`);
+      renderProducts();
+      renderCart();
+    }
+
+    async function loadOrders() {
+      orders = await fetchJSON(`${PHP_API}/orders`);
+      renderOrders();
+    }
+
+    async function loadOverview() {
+      const data = await fetchJSON(`${GO_API}/stats/overview`);
+      renderOverview(data);
+    }
+
+    async function loadTopProducts() {
+      const data = await fetchJSON(`${GO_API}/stats/top-products`);
+      renderTopProducts(data);
+    }
+
+    async function loadStatusStats() {
+      const data = await fetchJSON(`${GO_API}/stats/status`);
+      renderStatusStats(data);
+    }
+
+    async function createOrder() {
+      const customerName = document.getElementById("customerName").value.trim();
+      const items = getCartItems().map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity
+      }));
+
+      if (!customerName) {
+        alert("Veuillez saisir un nom client.");
+        return;
+      }
+
+      if (!items.length) {
+        alert("Ajoutez au moins un produit.");
+        return;
+      }
+
+      await fetchJSON(`${PHP_API}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          customer_name: customerName,
+          items
+        })
+      });
+
+      document.getElementById("customerName").value = "";
+      cart = {};
+      await refreshAll();
+    }
+
+    async function updateOrderStatus(orderId, status) {
+      await fetchJSON(`${PHP_API}/orders/${orderId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status })
+      });
+
+      await Promise.all([
+        loadOrders(),
+        loadOverview(),
+        loadTopProducts(),
+        loadStatusStats()
+      ]);
+    }
+
+    async function refreshAll() {
+      try {
+        await Promise.all([
+          loadProducts(),
+          loadOrders(),
+          loadOverview(),
+          loadTopProducts(),
+          loadStatusStats()
+        ]);
+      } catch (error) {
+        console.error(error);
+        //alert("Erreur de chargement : " + error.message);
+      }
+    }
+
+    document.getElementById("createOrderBtn").addEventListener("click", createOrder);
+
+    refreshAll();
+  </script>
+</body>
+</html>
