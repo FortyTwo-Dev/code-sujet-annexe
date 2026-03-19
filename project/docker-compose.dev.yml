@@ -1,0 +1,79 @@
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  php-api:
+    container_name: php-api
+    build:
+      context: ./api-php
+      dockerfile: Dockerfile
+    env_file:
+      - ./api-php/.env
+
+    networks:
+      - database-php-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  go-api:
+    container_name: go-api
+    build:
+      context: ./api-go
+      dockerfile: Dockerfile
+    networks:
+      - database-go-api
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./api-go/.env
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    container_name: db
+    image: postgres
+    environment:
+      POSTGRES_USER: '${DB_USER:-postgres}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
+      POSTGRES_DB: '${DB_NAME}'
+    volumes:
+      - '${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql'
+    networks:
+      - database-php-api
+      - database-go-api
+      - database-adminer
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    ports:
+      - "8888:8080"
+    networks:
+      - database-adminer
+    depends_on:
+      database:
+        condition: service_healthy
+
+networks:
+  database-php-api:
+  database-go-api:
+  database-adminer:
+
