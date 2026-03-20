@@ -4,11 +4,17 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    ports:
-      - "80:80"
+    networks:
+      - proxy
     depends_on:
       database:
         condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`app.docker.localhost`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls=true"
 
   php-api:
     container_name: php-api
@@ -16,15 +22,20 @@ services:
       context: ./api-php
       dockerfile: Dockerfile
     env_file:
-      - ./api-php/.env
+      - ./.env
 
     networks:
       - database-php-api
-    ports:
-      - "8000:8000"
+      - proxy
     depends_on:
       database:
         condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`php-api.docker.localhost`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls=true"
 
   go-api:
     container_name: go-api
@@ -33,13 +44,18 @@ services:
       dockerfile: Dockerfile
     networks:
       - database-go-api
-    ports:
-      - "8080:8080"
+      - proxy
     env_file:
-      - ./api-go/.env
+      - ./.env
     depends_on:
       database:
         condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`go-api.docker.localhost`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls=true"
 
   database:
     container_name: db
@@ -53,7 +69,7 @@ services:
     networks:
       - database-php-api
       - database-go-api
-      - database-adminer
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "localhost" ]
       interval: 30s
@@ -64,5 +80,6 @@ services:
 networks:
   database-php-api:
   database-go-api:
-  database-adminer:
+  proxy:
+    external: true
 
