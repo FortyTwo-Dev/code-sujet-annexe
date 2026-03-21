@@ -8,7 +8,9 @@ services:
 
     networks:
       # Connect to the 'traefik_proxy' overlay network for inter-container communication across nodes
-      - proxy
+      - proxy-php
+      - proxy-go
+      - proxy-frontend
 
     ports:
       - "80:80"
@@ -66,7 +68,7 @@ services:
     container_name: whoami
     restart: unless-stopped
     networks:
-      - proxy
+      - proxy-interne
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
@@ -74,5 +76,11 @@ services:
       - "traefik.http.routers.whoami.tls=true"
 
 networks:
-  proxy:
-    name: proxy
+  proxy-frontend:
+    name: proxy-frontend
+  proxy-php:
+    name: proxy-php
+  proxy-go:
+    name: proxy-go
+  proxy-interne:
+    name: proxy-interne
