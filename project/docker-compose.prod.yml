@@ -12,15 +12,13 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`app.docker.localhost`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.frontend.rule=Host(`app.docker.localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
 
   php-api:
     container_name: php-api
-    build:
-      context: ./api-php
-      dockerfile: Dockerfile
+    image: fortytwodev/api-php:1.0.1
     env_file:
       - ./.env
 
@@ -33,15 +31,14 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`php-api.docker.localhost`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.php-api.rule=Host(`php-api.docker.localhost`)"
+      - "traefik.http.routers.php-api.entrypoints=websecure"
+      - "traefik.http.routers.php-api.tls=true"
+      - "traefik.docker.network=proxy-php"
 
   go-api:
     container_name: go-api
-    build:
-      context: ./api-go
-      dockerfile: Dockerfile
+    image: fortytwodev/api-go:1.0.0
     networks:
       - database-go-api
       - proxy-go
@@ -53,9 +50,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`go-api.docker.localhost`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.go-api.rule=Host(`go-api.docker.localhost`)"
+      - "traefik.http.routers.go-api.entrypoints=websecure"
+      - "traefik.http.routers.go-api.tls=true"
+      - "traefik.docker.network=proxy-go"
 
   database:
     container_name: db
@@ -80,8 +78,6 @@ services:
 networks:
   database-php-api:
   database-go-api:
-  proxy:
-    external: true
   proxy-php:
     external: true
   proxy-go:

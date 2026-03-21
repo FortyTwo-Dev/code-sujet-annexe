@@ -11,7 +11,6 @@ services:
       - proxy-php
       - proxy-go
       - proxy-frontend
-      - proxy-interne
 
     ports:
       - "80:80"
@@ -37,7 +36,6 @@ services:
       # Providers
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=proxy-interne"
 
       # API & Dashboard
       - "--api.dashboard=true"
@@ -46,7 +44,7 @@ services:
       # Observability
       - "--log.level=INFO"
       - "--accesslog=true"
-      - "--metrics.prometheus=true"
+#      - "--metrics.prometheus=true"
 
     # Traefik Dynamic configuration via Docker labels
     labels:
@@ -63,19 +61,6 @@ services:
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$qU3l6Uf1$$jJi6HZ0ooLB42Shk4si2u/"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"
 
-  # Whoami application
-  whoami:
-    image: traefik/whoami
-    container_name: whoami
-    restart: unless-stopped
-    networks:
-      - proxy-interne
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls=true"
-
 networks:
   proxy-frontend:
     name: proxy-frontend
@@ -83,5 +68,3 @@ networks:
     name: proxy-php
   proxy-go:
     name: proxy-go
-  proxy-interne:
-    name: proxy-interne
