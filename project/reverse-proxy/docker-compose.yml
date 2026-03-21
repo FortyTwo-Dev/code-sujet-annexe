@@ -11,6 +11,7 @@ services:
       - proxy-php
       - proxy-go
       - proxy-frontend
+      - proxy-interne
 
     ports:
       - "80:80"
@@ -36,7 +37,7 @@ services:
       # Providers
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=proxy"
+      - "--providers.docker.network=proxy-interne"
 
       # API & Dashboard
       - "--api.dashboard=true"

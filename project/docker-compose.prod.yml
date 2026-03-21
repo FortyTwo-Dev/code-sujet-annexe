@@ -5,7 +5,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     networks:
-      - proxy
+      - proxy-frontend
     depends_on:
       database:
         condition: service_healthy
@@ -26,7 +26,7 @@ services:
 
     networks:
       - database-php-api
-      - proxy
+      - proxy-php
     depends_on:
       database:
         condition: service_healthy
@@ -44,7 +44,7 @@ services:
       dockerfile: Dockerfile
     networks:
       - database-go-api
-      - proxy
+      - proxy-go
     env_file:
       - ./.env
     depends_on:
@@ -81,5 +81,11 @@ networks:
   database-php-api:
   database-go-api:
   proxy:
+    external: true
+  proxy-php:
+    external: true
+  proxy-go:
+    external: true
+  proxy-frontend:
     external: true
 
