@@ -1,9 +1,7 @@
 services:
   frontend:
     container_name: frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: fortytwodev/frontend:1.0.0
     networks:
       - proxy-frontend
     depends_on:
@@ -12,7 +10,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`app.docker.localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`${APP_TRAEFIK_HOST}`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls=true"
 
@@ -31,7 +29,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.php-api.rule=Host(`php-api.docker.localhost`)"
+      - "traefik.http.routers.php-api.rule=Host(`${PHP_API_TRAEFIK_HOST}`)"
       - "traefik.http.routers.php-api.entrypoints=websecure"
       - "traefik.http.routers.php-api.tls=true"
       - "traefik.docker.network=proxy-php"
@@ -50,21 +48,20 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.go-api.rule=Host(`go-api.docker.localhost`)"
+      - "traefik.http.routers.go-api.rule=Host(`${GO_API_TRAEFIK_HOST}`)"
       - "traefik.http.routers.go-api.entrypoints=websecure"
       - "traefik.http.routers.go-api.tls=true"
       - "traefik.docker.network=proxy-go"
 
   database:
     container_name: db
-    image: postgres
+    image: fortytwodev/postgres:1.0.1
     environment:
-      POSTGRES_USER: '${DB_USER:-postgres}'
-      POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
+      POSTGRES_USER: '${DB_USER}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
       POSTGRES_DB: '${DB_NAME}'
     volumes:
-      - '${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql'
-      - postgres_data:/var/lib/postgresql/data
+      - 'postgres_data:/var/lib/postgresql'
     networks:
       - database-php-api
       - database-go-api

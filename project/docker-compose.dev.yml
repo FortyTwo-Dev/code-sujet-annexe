@@ -49,6 +49,7 @@ services:
       POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
       POSTGRES_DB: '${DB_NAME}'
     volumes:
+      - 'postgres_data:/var/lib/postgresql'
       - '${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql'
     networks:
       - database-php-api
@@ -76,4 +77,7 @@ networks:
   database-php-api:
   database-go-api:
   database-adminer:
+
+volumes:
+  postgres_data:
 
