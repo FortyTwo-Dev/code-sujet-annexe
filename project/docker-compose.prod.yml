@@ -1,7 +1,7 @@
 services:
   frontend:
     container_name: frontend
-    image: fortytwodev/frontend:1.0.0
+    image: gitea.infinitytest.ovh/fortytwo-dev/frontend:1.0.1
     networks:
       - proxy-frontend
     depends_on:
