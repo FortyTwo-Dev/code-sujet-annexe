@@ -43,7 +43,7 @@ services:
 
   database:
     container_name: db
-    image: postgres
+    image: postgres:18
     environment:
       POSTGRES_USER: '${DB_USER:-postgres}'
       POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
@@ -64,7 +64,7 @@ services:
 
   adminer:
     container_name: adminer
-    image: adminer:latest
+    image: adminer:5.4.2
     ports:
       - "8888:8080"
     networks:
