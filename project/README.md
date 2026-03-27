@@ -10,9 +10,14 @@ description des services
 
 `docker compose -f docker-compose.dev.yml up --build -d`
 
+il faut dans le app.js et le index.html changer les constantes pour mettre celle localhost:XXXX
+
 ## Environnement de Production
 
 `docker compose -f docker-compose.prod.yml up -d`
+
+il faut dans le app.js et le index.html changer les constantes pour mettre celle docker.localhost
+
 
 ## Services
 
