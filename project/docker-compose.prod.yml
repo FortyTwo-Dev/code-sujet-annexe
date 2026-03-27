@@ -16,7 +16,7 @@ services:
 
   php-api:
     container_name: php-api
-    image: fortytwodev/api-php:1.0.1
+    image: gitea.infinitytest.ovh/fortytwo-dev/api-php:1.0.0
     env_file:
       - ./.env
 
@@ -36,7 +36,7 @@ services:
 
   go-api:
     container_name: go-api
-    image: fortytwodev/api-go:1.0.0
+    image: gitea.infinitytest.ovh/fortytwo-dev/api-go:1.0.0
     networks:
       - database-go-api
       - proxy-go
@@ -55,7 +55,7 @@ services:
 
   database:
     container_name: db
-    image: fortytwodev/postgres:1.0.1
+    image: gitea.infinitytest.ovh/fortytwo-dev/postgres:1.0.1
     environment:
       POSTGRES_USER: '${DB_USER}'
       POSTGRES_PASSWORD: '${DB_PASSWORD}'
