@@ -17,7 +17,7 @@ title() {
 # Slide 0 : Introduction
 title "Présentation du projet : Plateforme de gestion de commandes restaurant"
 echo -e "\033[1;33mContexte : Dockeriser une application multi-services pour un restaurant.\033[0m"
-echo "Services : Frontend (HTML/JS), API PHP, API Go, PostgreSQL, Traefik (reverse proxy)"
+echo "Services : Frontend (HTML/JS), API PHP, API Go, PostgreSQL, Traefik (reverse proxy) et Adminer"
 wait_for_key
 
 # Slide 1 : Architecture de la partie Développement
@@ -27,7 +27,7 @@ echo "Reverse Proxy (Traefik) : route les requêtes vers les APIs."
 echo ""
 echo "Commande pour vérifier l'architecture réseau (si déjà lancé) :"
 echo -e "\033[1;32mdocker network ls\033[0m"
-# Faire un schéma en asci
+docker network ls | grep "database-*"
 wait_for_key
 
 # Slide 2 : Dockerisation des services
@@ -68,14 +68,15 @@ wait_for_key
 title "4. Vérification du mode développement"
 echo -e "\033[1;35mServices en cours d'exécution :\033[0m"
 echo -e "\033[1;32mdocker compose -f docker-compose.dev.yml ps\033[0m"
-docker docker compose -f docker-compose.dev.yml ps
+
+docker compose -f project/docker-compose.dev.yml ps
 wait_for_key
 
 echo -e "\n\033[1;35mAccès aux APIs (exemple) :\033[0m"
-echo "- Frontend : http://localhost:8080"
-echo "- API PHP : http://localhost:8081"
-echo "- API Go : http://localhost:8082"
-echo "- Traefik Dashboard : http://localhost:8085"
+echo "- Frontend : http://localhost:80"
+echo "- API PHP : http://localhost:8000"
+echo "- API Go : http://localhost:8080"
+echo "- Adminer : http://localhost:8888"
 wait_for_key
 
 # Slide 5 : Docker Compose (mode production)
@@ -91,7 +92,9 @@ wait_for_key
 title "6. Vérification du mode production"
 echo -e "\033[1;35mServices en cours d'exécution :\033[0m"
 echo -e "\033[1;32mdocker compose -f docker-compose.prod.yml ps\033[0m"
-docker compose -f docker-compose.prod.yml ps
+docker compose -f project/docker-compose.prod.yml ps
+#ctrl + C
+docker compose -f project/reverse-proxy/docker-compose.yml ps
 wait_for_key
 
 # Slide 7 : Architecture réseau et Traefik
@@ -110,10 +113,10 @@ EOF
 wait_for_key
 
 echo -e "\n\033[1;35mAccès via Traefik :\033[0m"
-echo "- Frontend : http://frontend.localhost"
-echo "- API PHP : http://api-php.localhost"
-echo "- API Go : http://api-go.localhost"
-echo "- Traefik Dashboard : http://traefik.localhost"
+echo "- Frontend : https://app.docker.localhost"
+echo "- API PHP : https://php-api.docker.localhost"
+echo "- API Go : https://go-api.docker.localhost"
+echo "- Traefik Dashboard : https://dashboard.docker.localhost"
 wait_for_key
 
 # Slide 8 : Utilisation d'un registre d'images (Bonus)
@@ -127,12 +130,12 @@ wait_for_key
 # Slide 9 : Critères d'évaluation
 title "9. Critères d'évaluation"
 echo -e "\033[1;35mPoints clés :\033[0m"
-echo "✅ Dockerfiles fonctionnels"
-echo "✅ Docker Compose dev et prod"
-echo "✅ Architecture réseau correcte"
-echo "✅ Schéma d'architecture produit"
-echo "✅ Documentation (README.md)"
-echo "✅ Bonus : Traefik, registre d'images, optimisations"
+echo "- Dockerfiles fonctionnels"
+echo "- Docker Compose dev et prod"
+echo "- Architecture réseau correcte"
+echo "- Schéma d'architecture produit"
+echo "- Documentation (README.md)"
+echo "- Bonus : Traefik, registre d'images, optimisations"
 wait_for_key
 
 # Slide 10 : Démo finale
@@ -154,3 +157,7 @@ echo -e "\n\033[1;32mFélicitations ! Ta plateforme est prête ! 🎉\033[0m"
 wait_for_key
 
 echo -e "\n\033[1;36m=== Fin de la présentation ===\033[0m"
+
+echo "arrêt des services..."
+docker compose -f project/docker-compose.prod.yml down
+docker compose -f project/reverse-proxy/docker-compose.yml down
