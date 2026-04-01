@@ -20,34 +20,36 @@ echo -e "\033[1;33mContexte : Dockeriser une application multi-services pour un 
 echo "Services : Frontend (HTML/JS), API PHP, API Go, PostgreSQL, Traefik (reverse proxy)"
 wait_for_key
 
-# Slide 1 : Architecture globale
-title "1. Architecture globale du projet"
+# Slide 1 : Architecture de la partie Développement
+title "1. Architecture de la partie développement"
 echo -e "\033[1;35mSchéma : Frontend → API PHP, Frontend → API Go, API PHP/Go → PostgreSQL\033[0m"
 echo "Reverse Proxy (Traefik) : route les requêtes vers les APIs."
 echo ""
 echo "Commande pour vérifier l'architecture réseau (si déjà lancé) :"
 echo -e "\033[1;32mdocker network ls\033[0m"
-docker network ls
+# Faire un schéma en asci
 wait_for_key
 
 # Slide 2 : Dockerisation des services
 title "2. Dockerisation des services"
-echo -e "\033[1;35mChaque service a son Dockerfile : frontend/, api-php/, api-go/\033[0m"
+echo -e "\033[1;35mChaque service a son Dockerfile : frontend/, api-php/, api-go/, postgres/\033[0m"
 echo ""
-echo "Exemple : Dockerfile pour l'API PHP"
-echo -e "\033[1;32mContenu possible :\033[0m"
-cat << 'EOF'
-FROM php:8.2-apache
-WORKDIR /var/www/html
-COPY . .
-RUN docker-php-ext-install pdo pdo_pgsql
-EXPOSE 80
-EOF
+echo -e "\033[1;32m API Go :\033[0m"
+cat project/api-go/Dockerfile
+wait_for_key
+echo -e "\033[1;32m API PHP :\033[0m"
+cat project/api-php/Dockerfile
+wait_for_key
+echo -e "\033[1;32m Frontend :\033[0m"
+cat project/frontend/Dockerfile
+wait_for_key
+echo -e "\033[1;32m Postgres :\033[0m"
+cat project/postgres/Dockerfile
 wait_for_key
 
 echo -e "\n\033[1;35mVérification des images générées :\033[0m"
 echo -e "\033[1;32mdocker images\033[0m"
-docker images | grep "api-php\|api-go\|frontend"
+docker images | grep "IMAGE\|api-php\|api-go\|frontend\|postgres"
 wait_for_key
 
 # Slide 3 : Docker Compose (mode développement)
@@ -57,14 +59,16 @@ echo "Services : frontend, api-php, api-go, postgres, traefik"
 echo "Volumes montés pour le développement."
 echo ""
 echo -e "\033[1;32mCommande pour lancer l'environnement dev :\033[0m"
-echo "docker compose -f docker-compose.dev.yml up -d"
+echo "docker compose -f docker-compose.dev.yml up --build -d"
 wait_for_key
+
+# lancer les service -> docker compose -f docker-compose.dev.yml up --build -d
 
 # Slide 4 : Vérification du mode développement
 title "4. Vérification du mode développement"
 echo -e "\033[1;35mServices en cours d'exécution :\033[0m"
 echo -e "\033[1;32mdocker compose -f docker-compose.dev.yml ps\033[0m"
-docker compose -f docker-compose.dev.yml ps
+docker docker compose -f docker-compose.dev.yml ps
 wait_for_key
 
 echo -e "\n\033[1;35mAccès aux APIs (exemple) :\033[0m"
